@@ -1,8 +1,19 @@
 import "./style.scss";
 
-export const Button = ({ onClick, children }: {onClick: () => void, children?: string}) => {
+type TProps = {
+	onClick: () => void,
+	children?: string,
+	label?: string
+}
+
+export const Button = ({ onClick, children, label }: TProps) => {
+	const text = <p style={{ marginRight: '5px' }}>{ label }</p>;
 
 	return (
-		<button className="button" onClick={onClick}>{children}</button>
+		<div>
+			<div>{ label && text }</div>
+
+			<button className="button" onClick={onClick}>{children}</button>
+		</div>
 	);
 };

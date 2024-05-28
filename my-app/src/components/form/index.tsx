@@ -1,43 +1,36 @@
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import './style.scss';
+import {useFetcher} from "../../hooks/useFetcher";
 
 interface FormProps {
     onUserAddition: (user: any) => void; // Принимаем функцию для обновления состояния верхнего компонента
 }
 
 const Form: React.FC<FormProps> = ({ onUserAddition }) => {
-	const [username, setUsername] = useState<string>('');
-	const [phone, setPhone] = useState<string>('');
-	const [website, setWebsite] = useState<string>('');
+	const [user, setUser] = useState({
+		username: '',
+		phone: '',
+		website: ''
+	});
 
-	const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setUsername(event.target.value);
-	};
+	function stateMutate(e: any) {
+		const { value, name } = e.target;
 
-	const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setPhone(event.target.value);
-	};
+		setUser(obj => {
+			let nObj = {...obj};
 
-	const handlewebsiteChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setWebsite(event.target.value);
-	};
+			nObj[name as keyof typeof user] = value;
+
+			return nObj;
+		})
+	}
+
+	const {postData} = useFetcher();
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		fetch('https://jsonplaceholder.typicode.com/users', {
-			method: 'POST',
-			body: JSON.stringify({
-				username,
-				phone,
-				website,
-			}),
-			headers: {
-				'Content-type': 'application/json; charset=UTF-8',
-			},
-		})
-			.then((response) => response.json())
-			.then((user) => onUserAddition(user));
+		postData(user, onUserAddition);
 	};
 
 	return (
@@ -45,19 +38,34 @@ const Form: React.FC<FormProps> = ({ onUserAddition }) => {
 			<div>
 				<label>
 					Username:
-					<input type="text" value={username} onChange={handleUsernameChange} />
+					<input
+						name="username"
+						type="text"
+						defaultValue={user.username}
+						onChange={stateMutate}
+					/>
 				</label>
 			</div>
 			<div>
 				<label>
 					Phone:
-					<input type="text" value={phone} onChange={handlePhoneChange} />
+					<input
+						name="phone"
+						type="text"
+						defaultValue={user.phone}
+						onChange={stateMutate}
+					/>
 				</label>
 			</div>
 			<div>
 				<label>
 					Website:
-					<input type="email" value={website} onChange={handlewebsiteChange} />
+					<input
+						name="website"
+						type="email"
+						defaultValue={user.website}
+						onChange={stateMutate}
+					/>
 				</label>
 			</div>
 			<button className='button' type="submit">Submit</button>
